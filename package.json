@@ -1,0 +1,23 @@
+{
+  "name": "sendmail-lite",
+  "version": "1.0.0",
+  "description": "a 100% js sendmail, it is very simple useful, but only support send html formart email, and it does not depend anything",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sendmail",
+    "email"
+  ],
+  "author": "zengming",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zengming00/node-sendmail-lite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zengming00/node-sendmail-lite/issues"
+  },
+  "homepage": "https://github.com/zengming00/node-sendmail-lite#readme"
+}
