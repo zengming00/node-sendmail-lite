@@ -7,7 +7,7 @@ var readline = require('readline');
 var ExecList = require('./ExecList');
 
 function base64_encode(str) {
-    return new Buffer(str).toString('base64');
+  return new Buffer(str).toString('base64');
 }
 
 /**
@@ -19,116 +19,112 @@ function base64_encode(str) {
  * @param $content      邮件内容（只支持html）
  * @param cb  function(err) 成功则不带参数，失败带一个err参数
  */
-function sendMail($senderName, $sender, $to, $subject, $content, cb) {
-    var debug = false;
-    var $toHostname = $to.substr($to.indexOf('@') + 1);
-    dns.resolveMx($toHostname, function (e, addrs) {
-        var addr = addrs[0] && addrs[0].exchange;
-        if (!addr) return cb('无法找到目标邮箱主机');
+function sendMail($senderName, $sender, $to, $subject, $content, callback) {
+  var debug = false;
+  var execList = new ExecList();
+  var $toHostname = $to.substr($to.indexOf('@') + 1);
 
-        //建立连接
-        var socket = net.connect(25, addr);
-        socket.setEncoding('utf8');
-        socket.on('error', cb).setTimeout(10000, function () {
-            cb('超时');
-            socket.destroy();
-        });
+  dns.resolveMx($toHostname, function (e, addrs) {
+    var addr = addrs[0] && addrs[0].exchange;
+    if (!addr) {
+      return callback(new Error('can not find MxRecord'));
+    }
 
-        var list = new ExecList();
-        list.pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 220) {
-                    next(p);
-                } else {
-                    var $senderHost = $sender.substr($sender.indexOf('@') + 1);
-                    socket.write("HELO " + $senderHost + "\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 250) {
-                    next(p);
-                } else {
-                    socket.write("MAIL FROM: <" + $sender + ">\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 250) {
-                    next(p);
-                } else {
-                    socket.write("RCPT TO: <" + $to + ">\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 250) {
-                    next(p);
-                } else {
-                    socket.write("DATA\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 354) {
-                    next(p);
-                } else {
-                    socket.write("From: =?utf8?B?" + base64_encode($senderName) + "?= <" + $sender + ">\r\n");
-                    socket.write("To: " + $to + "\r\n");
-                    socket.write("Subject: =?utf8?B?" + base64_encode($subject) + "?=\r\n");
-                    socket.write("Date: " + new Date() + "\r\n");
-                    socket.write("MIME-Version: 1.0\r\n");
-                    socket.write("Content-Type: text/html; charset=\"utf8\"\r\n");
-                    socket.write("Content-Transfer-Encoding: base64\r\n");
-                    socket.write("X-Priority: 3\r\n");
-                    socket.write("X-Mailer: Node.js Mail Sender\r\n");
-                    socket.write("\r\n");
-                    socket.write(base64_encode($content));
-                    socket.write("\r\n.\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) == 550) {
-                    next("邮件被拦截:" + p);
-                } else if (parseInt(p) != 250) {
-                    next(p);
-                } else {
-                    socket.write("QUIT\r\n");
-                    next();
-                }
-            }
-        ).pending(
-            function foo(p, next) {
-                debug && console.log(p);
-                if (parseInt(p) != 221) {
-                    next(p);
-                } else {
-                    socket.end();
-                    cb(null)
-                }
-            }
-        ).catch(function (e) {
-            socket.end();
-            cb(e);
-        });
+    //建立连接
+    var socket = net.connect(25, addr);
+    socket.setEncoding('utf8');
+    socket.setTimeout(1000 * 10, function () {
+      execList.terminated();
+      socket.destroy();
+      callback(new Error('timeout'));
+    });
+    socket.on('error', function (err) {
+      execList.terminated();
+      callback(err)
+    });
 
-        var rl = readline.createInterface({input: socket});
-        rl.on('line', function (line) {
-            list.exec(line);
-        });
-    })
+    execList.pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 220) {
+        next(new Error(line));
+      } else {
+        var $senderHost = $sender.substr($sender.indexOf('@') + 1);
+        socket.write("HELO " + $senderHost + "\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 250) {
+        next(new Error(line));
+      } else {
+        socket.write("MAIL FROM: <" + $sender + ">\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 250) {
+        next(new Error(line));
+      } else {
+        socket.write("RCPT TO: <" + $to + ">\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 250) {
+        next(new Error(line));
+      } else {
+        socket.write("DATA\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 354) {
+        next(new Error(line));
+      } else {
+        socket.write("From: =?utf8?B?" + base64_encode($senderName) + "?= <" + $sender + ">\r\n");
+        socket.write("To: " + $to + "\r\n");
+        socket.write("Subject: =?utf8?B?" + base64_encode($subject) + "?=\r\n");
+        socket.write("Date: " + new Date() + "\r\n");
+        socket.write("MIME-Version: 1.0\r\n");
+        socket.write("Content-Type: text/html; charset=\"utf8\"\r\n");
+        socket.write("Content-Transfer-Encoding: base64\r\n");
+        socket.write("X-Priority: 3\r\n");
+        socket.write("X-Mailer: Node.js Mail Sender\r\n");
+        socket.write("\r\n");
+        socket.write(base64_encode($content));
+        socket.write("\r\n.\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) == 550) {
+        next(new Error("Mail is intercepted: " + line));
+      } else if (parseInt(line) != 250) {
+        next(new Error(line));
+      } else {
+        socket.write("QUIT\r\n");
+        next();
+      }
+    }).pending(function (line, next) {
+      debug && console.log(line);
+      if (parseInt(line) != 221) {
+        next(new Error(line));
+      } else {
+        socket.end();
+        // 完成
+        callback(null)
+      }
+    }).catch(function (err) {
+      execList.terminated();
+      socket.end();
+      callback(err);
+    });
+
+    var rl = readline.createInterface({ input: socket });
+    rl.on('line', function (line) {
+      execList.exec(line);
+    });
+  })
 }
 
 
