@@ -19,7 +19,7 @@ var $content = '\
 var $to = "243786753@qq.com";
 
 var $senderName="这是发件人";
-var $sender="admin@serverjs.cn";
+var $sender="admin@zengming.me";
 var $subject="这是邮件标题";
 
 sendMail($senderName, $sender, $to, $subject, $content, function (err) {

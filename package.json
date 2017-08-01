@@ -1,7 +1,7 @@
 {
   "name": "sendmail-lite",
-  "version": "1.0.1",
-  "description": "a 100% js sendmail, it is very simple useful, but only support send html formart email, and it does not depend anything",
+  "version": "1.0.2",
+  "description": "a 100% js sendmail, it is very simple useful, can running on any platform, but only support send html formart email, and it does not depend anything",
   "main": "sendMail.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
