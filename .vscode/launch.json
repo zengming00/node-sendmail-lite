@@ -1,0 +1,23 @@
+{
+  // Use IntelliSense to learn about possible Node.js debug attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch TypeScript",
+      "program": "${workspaceRoot}/src/demo/test.ts",
+      "smartStep": true,
+      "preLaunchTask": "compile",
+      "env": {
+        "NODE_ENV": "_development,development",
+        "DEBUG": "zengming:*"
+      },
+      "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+      ]
+    }
+  ]
+}
