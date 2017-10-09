@@ -10,7 +10,7 @@ npm install sendmail-lite --save
 # demo
 
 ```js
-var sendMail = require('sendmail-lite');
+var sendMail = require('sendmail-lite').sendMail;
 
 var $content = '\
 <table style="width:100%;height:100%;">\
@@ -40,6 +40,14 @@ sendMail($senderName, $sender, $to, $subject, $content, function (err) {
     console.log('发送成功');
 });
 ```
+# typescript support
+```typescript
+import { sendMail } from 'sendmail-lite';
+```
+
+# can not receive mail ?
+
+Because Mail is intercepted
 
 # License
 MIT
