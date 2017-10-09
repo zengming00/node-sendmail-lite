@@ -1,6 +1,6 @@
-var sendMail = require('../sendMail');//sendmail-lite
+import { sendMail } from '../sendMail';
 
-var $content = '\
+const content = '\
 <table style="width:100%;height:100%;">\
     <tr><td style="text-align: center;">\
     <div style="display: inline-block; padding:30px; color:red; ">\
@@ -14,17 +14,21 @@ var $content = '\
 </table>\
 ';
 
-//只测试了163和QQ邮箱，测试时请反下面的邮箱地址换成你自己的
-// $to = "15679700245@163.com";
-var $to = "243786753@qq.com";
+// 收不到邮件是因为被邮箱拦截了
+// 只测试了163和QQ邮箱，测试时请反下面的邮箱地址换成你自己的
+// to = "15679700245@163.com";
+const to = '243786753@qq.com';
 
-var $senderName = "这是发件人";
-var $sender = "admin@zengming.me";
-var $subject = "这是邮件标题";
+const senderName = '这是发件人';
+const sender = 'admin@zengming.me';
+const subject = '这是邮件标题';
 
-sendMail($senderName, $sender, $to, $subject, $content, function (err) {
-    if (err) return console.log(err);
-    console.log('发送成功');
+// tslint:disable:no-console
+sendMail(senderName, sender, to, subject, content, function (err) {
+  if (err) {
+    return console.log(err);
+  }
+  console.log('发送成功');
 });
 
 

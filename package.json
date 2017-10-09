@@ -1,10 +1,17 @@
 {
   "name": "sendmail-lite",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "a 100% js sendmail, it is very simple useful, can running on any platform, but only support send html formart email, and it does not depend anything",
-  "main": "sendMail.js",
+  "main": "dist/sendMail.js",
+  "typings": "dist/sendMail.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "rm -rf dist && tsc",
+    "lint": "tslint --fix ./src/**/*.ts",
+    "test": "npm run compile && node ./dist/demo/test",
+    "prepublish": "npm run lint && npm run compile"
   },
   "keywords": [
     "sendmail",
@@ -19,5 +26,10 @@
   "bugs": {
     "url": "https://github.com/zengming00/node-sendmail-lite/issues"
   },
-  "homepage": "https://github.com/zengming00/node-sendmail-lite#readme"
+  "homepage": "https://github.com/zengming00/node-sendmail-lite#readme",
+  "dependencies": {
+    "@types/debug": "0.0.30",
+    "@types/node": "^8.0.33",
+    "debug": "^3.1.0"
+  }
 }
